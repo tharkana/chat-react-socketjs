@@ -11,10 +11,10 @@ class App extends Component {
     super(props, context);
 
     this.state = {
-      username : null,
+      username: null,
       users: [],
       isRegisterInProcess: false,
-      messages : [],
+      messages: [],
       selectedUser: null
     };
 
@@ -22,8 +22,9 @@ class App extends Component {
 
   }
 
-  selectUser(user){
-      this.setState({ selectedUser: user } );
+  selectUser(user) {
+    this.setState({ messages: [] });
+    this.setState({ selectedUser: user });
   }
 
   setUsername(username, e) {
@@ -37,48 +38,49 @@ class App extends Component {
     this.setState({
       isRegisterInProcess: true
     });
-    this.socket = socket("http://192.168.80.151:3000", { query : 'username='+this.state.username});
+    this.socket = socket("http://192.168.80.151:3006", { query: 'username=' + this.state.username });
 
     this.socket.on("USER_LIST", (users) => {
-        console.log(users);
-        this.setState({users: users});
-      }
+      console.log(users);
+
+      this.setState({ users: users });
+    }
     );
 
-    this.socket.on( "RECEIVE_MESSAGE",  (message) => {
+    this.socket.on("RECEIVE_MESSAGE", (message) => {
       console.log(message);
-        this.setState({ messages: [ ...this.state.messages, message]  });    
-      });
+      this.setState({ messages: [...this.state.messages, message] });
+    });
   }
 
-  sendMessage(message, e){
+  sendMessage(message, e) {
 
-    if(this.state.selectedUser == null || this.state.selectedUser.socket_id  == null){
+    if (this.state.selectedUser == null || this.state.selectedUser.socket_id == null) {
       alert('Please select a user');
-    }else {
-      this.setState({ messages: [ ...this.state.messages, message]  }); 
+    } else {
+      this.setState({ messages: [...this.state.messages, message] });
       this.socket.emit('SEND_MESSAGE', {
-        message : message,
-        socket_id : this.state.selectedUser != null ? this.state.selectedUser.socket_id : null
+        message: message,
+        socket_id: this.state.selectedUser != null ? this.state.selectedUser.socket_id : null
       });
     }
-    
-}
+
+  }
 
   render() {
     return (
       <div className="container">
         {this.state.isRegisterInProcess ? (
           <React.Fragment>
-            <User users={this.state.users} selectUser={this.selectUser.bind(this)} />
-            <Chat 
-              sendMessage={this.sendMessage.bind(this)} 
-              messages={this.state.messages}            
+            <User currentUser={this.state.username} users={this.state.users} selectUser={this.selectUser.bind(this)} />
+            <Chat
+              sendMessage={this.sendMessage.bind(this)}
+              messages={this.state.messages}
             />
           </React.Fragment>
         ) : (
-          <Login  setUsername={this.setUsername} />
-        )}
+            <Login setUsername={this.setUsername} />
+          )}
       </div>
     );
   }

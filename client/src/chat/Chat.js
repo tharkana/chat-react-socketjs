@@ -32,7 +32,7 @@ componentWillReceiveProps(nextProps){
                 <div className="row">
                         <div className="card">
                             <div className="card-body">
-                                <div className="card-title">Global Chat</div>
+                                <div className="card-title">Chat</div>
                                 <hr/>
                                
                                 <div >
