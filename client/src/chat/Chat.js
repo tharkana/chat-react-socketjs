@@ -38,7 +38,7 @@ componentWillReceiveProps(nextProps){
                                 <div >
                                     {this.state.messages.map( (message, index) => {
                                         return (
-                                            <div key={index} className="row">
+                                            <div style={{backgroundColor: (  index % 2 == 1) ? "#dbdbdb" : "white"}} key={index} className="row">
                                                 <div className="col-4"> <b> {message.username}: </b></div>
                                                 <div className="col-4"> {message.message}</div>
 
