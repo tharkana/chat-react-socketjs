@@ -2,29 +2,29 @@ import React, { Component } from "react";
 import "./App.css";
 import Chat from "./chat/Chat";
 
-// import socket from "./service/socket";
 import socket from "socket.io-client";
 import Login from "./login/login";
+import User from "./chat/User";
 
 class App extends Component {
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      users: null,
+      username : null,
+      users: [],
       isRegisterInProcess: false,
-      messages : []
+      messages : [],
+      selectedUser: null
     };
 
-    // this.onEnterChatroom = this.onEnterChatroom.bind(this)
-    // this.onLeaveChatroom = this.onLeaveChatroom.bind(this)
-    // this.getChatrooms = this.getChatrooms.bind(this)
-    // this.register = this.register.bind(this)
-    // this.renderUserSelectionOrRedirect = this.renderUserSelectionOrRedirect.bind(this)
     this.setUsername = this.setUsername.bind(this)
 
   }
 
+  selectUser(user){
+      this.setState({ selectedUser: user } );
+  }
 
   setUsername(username, e) {
     this.setState({ username: username }, () => {
@@ -33,36 +33,36 @@ class App extends Component {
   }
 
   initChat() {
-    //localStorage.setItem("username", this.state.username);
+
     this.setState({
       isRegisterInProcess: true
     });
-    this.socket = socket("http://localhost:3000");
-    // this.socket = socketIOClient("ws://localhost:8989", {
-    //   query: "username=" + this.state.username + "&uid=" + this.state.uid
-    // });
+    this.socket = socket("http://192.168.80.151:3000", { query : 'username='+this.state.username});
 
-    this.socket.on("updateUsersList", (users) => {
+    this.socket.on("USER_LIST", (users) => {
         console.log(users);
         this.setState({users: users});
       }
     );
 
-    this.socket.on( "message",  (message) => {
+    this.socket.on( "RECEIVE_MESSAGE",  (message) => {
+      console.log(message);
         this.setState({ messages: [ ...this.state.messages, message]  });    
       });
   }
 
   sendMessage(message, e){
-    console.log(message);
-    this.setState({
-        messages :[ ...this.state.messages, {
-           message : message,
-       }]
-    });
-    this.socket.emit('SEND_MESSAGE', {
+
+    if(this.state.selectedUser == null || this.state.selectedUser.socket_id  == null){
+      alert('Please select a user');
+    }else {
+      this.setState({ messages: [ ...this.state.messages, message]  }); 
+      this.socket.emit('SEND_MESSAGE', {
         message : message,
-    });
+        socket_id : this.state.selectedUser != null ? this.state.selectedUser.socket_id : null
+      });
+    }
+    
 }
 
   render() {
@@ -70,14 +70,13 @@ class App extends Component {
       <div className="container">
         {this.state.isRegisterInProcess ? (
           <React.Fragment>
-            {/* <Users users={this.state.users} /> */}
+            <User users={this.state.users} selectUser={this.selectUser.bind(this)} />
             <Chat 
               sendMessage={this.sendMessage.bind(this)} 
               messages={this.state.messages}            
             />
           </React.Fragment>
         ) : (
-          // <Login setUsername={this.setUsername.bind(this)} />
           <Login  setUsername={this.setUsername} />
         )}
       </div>
