@@ -39,7 +39,9 @@ componentWillReceiveProps(nextProps){
                                     {this.state.messages.map( (message, index) => {
                                         return (
                                             <div key={index} className="row">
-                                                <div className="col-4">{message}</div>
+                                                <div className="col-4"> <b> {message.username}: </b></div>
+                                                <div className="col-4"> {message.message}</div>
+
                                             </div>
                                         )
                                     })}

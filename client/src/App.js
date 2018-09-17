@@ -58,10 +58,11 @@ class App extends Component {
     if (this.state.selectedUser == null || this.state.selectedUser.socket_id == null) {
       alert('Please select a user');
     } else {
-      this.setState({ messages: [...this.state.messages, message] });
+      this.setState({ messages: [...this.state.messages, { username: "Me", message: message } ] });
       this.socket.emit('SEND_MESSAGE', {
         message: message,
-        socket_id: this.state.selectedUser != null ? this.state.selectedUser.socket_id : null
+        socket_id: this.state.selectedUser != null ? this.state.selectedUser.socket_id : null,
+        username :  this.state.username
       });
     }
 
