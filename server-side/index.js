@@ -35,7 +35,7 @@ io.on("connection", function(socket) {
 
   socket.on("SEND_MESSAGE", (msg) => {
     console.log("message: " + JSON.stringify(msg)  );
-    io.to(msg.socket_id).emit("RECEIVE_MESSAGE", msg.message);
+    io.to(msg.socket_id).emit("RECEIVE_MESSAGE", msg);
   });
 });
 
